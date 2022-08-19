@@ -41,11 +41,11 @@ exports.create = async (req, res) => {
 exports.findAll = (req, res) => {
   try {
     let { offset, limit } = helper.getOffsetLimit(req.query)
-    let { productOrder, orderByError } = helper.getOrderBy(req.query)
+    let { order, orderByError } = helper.getProductsOrderBy(req.query)
 
     if (orderByError) return res.status(500).send({orderByError})
 
-    Products.findAndCountAll({ offset, limit, order: productOrder })
+    Products.findAndCountAll({ offset, limit, order })
       .then(data => res.send(data))
       .catch(err => {
         res.status(500).send({

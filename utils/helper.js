@@ -1,6 +1,8 @@
 const db = require('../models')
 const Op = db.Sequelize.Op
 const Orders = db.orders
+const Products = db.products
+const Inventories = db.inventories
 const { sequelize } = require('../models')
 
 exports.getOffsetLimit = ({page=0, limit=20}) => {
@@ -19,11 +21,11 @@ exports.inventoryFilterOptions = ({name, price, operator}) => {
     
   if (price)
     if (operator == 'lt')
-      inventoryOptions.price_cents = {[Op.lt]: +price}
+      inventoryOptions.quantity = {[Op.lt]: +price}
     else if (operator == 'gt')
-      inventoryOptions.price_cents = {[Op.gt]: +price}
+      inventoryOptions.quantity = {[Op.gt]: +price}
     else if (operator == 'eq')
-      inventoryOptions.price_cents = {[Op.eq]: +price}
+      inventoryOptions.quantity = {[Op.eq]: +price}
     else error = 'Invalid Operator.'
   
   return { productOptions, inventoryOptions, error }
@@ -31,7 +33,6 @@ exports.inventoryFilterOptions = ({name, price, operator}) => {
 
 exports.ordersFilterOptions = ({name, order_status, shipper}) => {
   let orderOptions = {}
-  let productOptions = {}
 
   if (name) {
     orderOptions[Op.or]= [
@@ -48,7 +49,7 @@ exports.ordersFilterOptions = ({name, order_status, shipper}) => {
   if (shipper)
     orderOptions.shipper_name= {[Op.like]: '%'+shipper+'%'}
   
-  return { orderOptions, productOptions }
+  return { orderOptions }
 }
 
 exports.getSaleState = async totalSale => {
@@ -60,26 +61,64 @@ exports.getSaleState = async totalSale => {
   return { totalSale, average, totalOrders }
 }
 
-exports.getTotalSale = async () => {
+exports.getTotalSale = async (orderOptions) => {
   let sale = await Orders.findAll({
-    attributes: [[sequelize.fn('sum', sequelize.col('total_cents')), 'totalSale']],
+    where: orderOptions,
+    attributes: [[sequelize.fn('sum', sequelize.col('total_cents')), 'totalSale']]
   })
 
   return sale[0].dataValues.totalSale
 }
 
-exports.getOrderBy = ({sort_table_name, sort_column, sort_order}) => {
-  let inventoryOrder = []
-  let productOrder = []
+exports.getInventoriesOrderBy = ({sort_table_name, sort_column, sort_order}) => {
   let order = []
   let orderByError = ''
 
   if(sort_column && sort_order) {
-    if(sort_table_name == 'inventories') inventoryOrder.push([[sort_column, sort_order]])
-    else if(sort_table_name == 'products') productOrder.push([[sort_column, sort_order]])
-    else if(sort_table_name == 'order') order.push([[sort_column, sort_order]])
+    if(sort_table_name == 'inventories') order.push([sort_column, sort_order])
+    else if(sort_table_name == 'products') order.push([Products, sort_column, sort_order])
+    else if(sort_table_name == 'orders') order.push([Orders, sort_column, sort_order])
     else orderByError='Parameters missing for sorting.'
   }
-  
-  return { order, inventoryOrder, productOrder, orderByError }
+
+  return { order, orderByError }
+}
+
+exports.getInventoriesOrderBy = ({sort_table_name, sort_column, sort_order}) => {
+  let order = []
+  let orderByError = ''
+
+  if(sort_column && sort_order) {
+    if(sort_table_name == 'inventories') order.push([sort_column, sort_order])
+    else if(sort_table_name == 'products') order.push([Products, sort_column, sort_order])
+    else orderByError='Parameters missing for sorting.'
+  }
+
+  return { order, orderByError }
+}
+
+exports.getOrdersOrderBy = ({sort_table_name, sort_column, sort_order}) => {
+  let order = []
+  let orderByError = ''
+
+  if(sort_column && sort_order) {
+    if(sort_table_name == 'inventories') order.push([Inventories, sort_column, sort_order])
+    else if(sort_table_name == 'products') order.push([Products, sort_column, sort_order])
+    else if(sort_table_name == 'orders') order.push([sort_column, sort_order])
+    else orderByError='Parameters missing for sorting.'
+  }
+
+  return { order, orderByError }
+}
+
+exports.getProductsOrderBy = ({sort_table_name, sort_column, sort_order}) => {
+  let order = []
+  let orderByError = ''
+
+  if(sort_column && sort_order) {
+    if(sort_table_name == 'products') order.push([sort_column, sort_order])
+    else orderByError='Parameters missing for sorting or invalid sorting.'
+  }
+
+  return { order, orderByError }
 }

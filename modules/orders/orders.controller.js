@@ -10,8 +10,8 @@ const Products = db.products
 exports.findAll = (req, res) => {
   try {
     let { offset, limit } = helper.getOffsetLimit(req.query)
-    let { orderOptions, productOptions } = helper.ordersFilterOptions(req.query)
-    let { order, inventoryOrder, productOrder, orderByError } = helper.getOrderBy(req.query)
+    let { orderOptions } = helper.ordersFilterOptions(req.query)
+    let { order, orderByError } = helper.getOrdersOrderBy(req.query)
 
     if (orderByError) return res.status(500).send({orderByError})
 
@@ -19,23 +19,25 @@ exports.findAll = (req, res) => {
       where: orderOptions,
       include: [{
         model: Products,
-        where: productOptions,
         include: [{
           model: Inventory,
           attributes: attributes.order_product_inventory,
-          order: inventoryOrder
         }],
         attributes: attributes.order_products,
-        order: productOrder
       }],
       offset, limit, order,
       attributes: attributes.orders
     })
       .then(async ({ rows }) => {
-        let sale = await helper.getTotalSale()
-        let { totalOrders, totalSale, average } = await helper.getSaleState(sale)
+        let sale = await helper.getTotalSale(orderOptions)
+        let { totalSale, average } = await helper.getSaleState(sale)
 
-        res.send({ totalSale, average, count: totalOrders, rows })
+        const count = await Orders.findAndCountAll({
+          where: orderOptions,
+          attributes: attributes.orders
+        })
+
+        res.send({ totalSale, average, count: count.count, rows })
       })
       .catch(err => {
         res.status(500).send({

@@ -10,7 +10,7 @@ exports.findAll = (req, res) => {
   try {
     var { offset, limit } = helper.getOffsetLimit(req.query)
     let { productOptions, inventoryOptions, error } = helper.inventoryFilterOptions(req.query)
-    let { inventoryOrder, productOrder, orderByError } = helper.getOrderBy(req.query)
+    let { order, orderByError } = helper.getInventoriesOrderBy(req.query)
 
     if (error) return res.status(500).send({error})
     if (orderByError) return res.status(500).send({orderByError})
@@ -21,10 +21,9 @@ exports.findAll = (req, res) => {
         model: Products,
         where: productOptions,
         attributes: attributes.inventory_products,
-        order: productOrder
       }],
-      offset, limit, order: inventoryOrder,
-      attributes: attributes.inventory,
+      offset, limit, order,
+      attributes: attributes.inventory
     })
       .then(inventory => res.send(inventory))
       .catch(err => {
