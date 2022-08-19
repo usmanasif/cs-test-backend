@@ -1,9 +1,12 @@
+'use strict'
 
-'use strict';
-const express = require("express");
-const router = express.Router();
-const authcontroller = require('./authentication.controller');
+const express = require('express')
 
-router.post('/login', authcontroller.login);
+const authcontroller = require('./authentication.controller')
+const middleware = require('../../utils/middleware')
 
-module.exports = router;
+const router = express.Router()
+
+router.post('/login', middleware.auth, authcontroller.login)
+
+module.exports = router
