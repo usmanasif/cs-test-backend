@@ -1,0 +1,59 @@
+{
+  "development": {
+    "username": "root",
+    "password": "rootroot",
+    "database": "common_sold",
+    "host": "localhost",
+    "dialect": "mysql",
+    "port": "3306",
+    "pool": {
+      "max": 32,
+      "min": 0,
+      "acquire": 30000,
+      "idle": 10000
+    },
+    "dialectOptions": {
+      "dateStrings": true,
+      "typeCast": true
+    },
+    "logging": false
+  },
+  "test": {
+    "username": "root",
+    "password": "rootroot",
+    "database": "common_sold",
+    "host": "localhost",
+    "dialect": "mysql",
+    "port": "3306",
+    "pool": {
+      "max": 32,
+      "min": 0,
+      "acquire": 30000,
+      "idle": 10000
+    },
+    "dialectOptions": {
+      "dateStrings": true,
+      "typeCast": true
+    },
+    "logging": false
+  },
+  "production": {
+    "username": "root",
+    "password": "rootroot",
+    "database": "common_sold",
+    "host": "localhost",
+    "dialect": "mysql",
+    "port": "3306",
+    "pool": {
+      "max": 32,
+      "min": 0,
+      "acquire": 30000,
+      "idle": 10000
+    },
+    "dialectOptions": {
+      "dateStrings": true,
+      "typeCast": true
+    },
+    "logging": false
+  }
+}
