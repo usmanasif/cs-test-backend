@@ -1,27 +1,69 @@
-'use strict';
+'use strict'
 
 module.exports = (sequelize, DataTypes) => {
   const users = sequelize.define('users', {
-    name: DataTypes.STRING,
-    email: DataTypes.STRING,
-    password_hash: DataTypes.STRING,
-    password_plain: DataTypes.STRING,
-    superadmin: DataTypes.BOOLEAN,
-    shop_name: DataTypes.STRING,
-    remember_token: DataTypes.STRING,
-    card_brand: DataTypes.STRING,
-    card_last_four: DataTypes.STRING,
-    trial_ends_at: DataTypes.DATE,
-    shop_domain: DataTypes.STRING,
-    is_enabled: DataTypes.BOOLEAN,
-    billing_plan: DataTypes.STRING,
-    trial_starts_at: DataTypes.DATE,
-  }, { timestamps: false });
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    password_hash: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    password_plain: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    superadmin: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
+    shop_name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    remember_token: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    card_brand: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    card_last_four: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    trial_ends_at: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    shop_domain: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    is_enabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
+    billing_plan: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    trial_starts_at: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+  }, { timestamps: true })
 
-  users.associate = function (models) {
+  users.associate = models => {
     // associations can be defined here
-    // users.hasMany(models.products)
-  };
+    users.hasMany(models.products, { foreignKey: { name: 'admin_id' }})
+  }
   
-  return users;
-};
+  return users
+}
