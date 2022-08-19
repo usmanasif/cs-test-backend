@@ -1,2 +1,0 @@
-Install Dependencies
-npm install
